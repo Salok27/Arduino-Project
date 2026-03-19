@@ -1,0 +1,9 @@
+void loop() {
+  fadeToBlackBy(leds, NUM_LEDS, 20);  // Trail fade
+  int pos = beatsin16(13, 0, NUM_LEDS - 1);
+  leds[pos] = CHSV(hue, 255, 255);
+  FastLED.show();
+
+  hue += 4;
+  delay(20);
+}

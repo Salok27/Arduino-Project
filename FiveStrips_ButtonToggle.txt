@@ -1,0 +1,79 @@
+#include <FastLED.h>
+
+#define NUM_LEDS 100
+#define BUTTON_PIN 2   // Button pin
+#define BRIGHTNESS 100
+#define LED_TYPE WS2812B
+#define COLOR_ORDER GRB
+
+// LED data pins
+#define LED_PIN_1 3
+#define LED_PIN_2 4
+#define LED_PIN_3 5
+#define LED_PIN_4 6
+#define LED_PIN_5 7
+
+// Create arrays for each strip
+CRGB leds1[NUM_LEDS];
+CRGB leds2[NUM_LEDS];
+CRGB leds3[NUM_LEDS];
+CRGB leds4[NUM_LEDS];
+CRGB leds5[NUM_LEDS];
+
+bool ledsOn = false;  // Track on/off state
+
+void setup() {
+  // Initialize LED strips
+  FastLED.addLeds<LED_TYPE, LED_PIN_1, COLOR_ORDER>(leds1, NUM_LEDS);
+  FastLED.addLeds<LED_TYPE, LED_PIN_2, COLOR_ORDER>(leds2, NUM_LEDS);
+  FastLED.addLeds<LED_TYPE, LED_PIN_3, COLOR_ORDER>(leds3, NUM_LEDS);
+  FastLED.addLeds<LED_TYPE, LED_PIN_4, COLOR_ORDER>(leds4, NUM_LEDS);
+  FastLED.addLeds<LED_TYPE, LED_PIN_5, COLOR_ORDER>(leds5, NUM_LEDS);
+
+  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.clear();
+  FastLED.show();
+
+  // Set up button
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  // Button wiring: one side to GND, other to pin 2
+}
+
+void loop() {
+  static bool lastButtonState = HIGH;
+  bool buttonState = digitalRead(BUTTON_PIN);
+
+  // Detect button press (HIGH → LOW transition)
+  if (lastButtonState == HIGH && buttonState == LOW) {
+    delay(50); // debounce
+    ledsOn = !ledsOn; // Toggle LEDs on/off
+
+    if (ledsOn) {
+      // Soft warm white color
+      CRGB warmWhite = CRGB(255, 230, 180);
+
+      // Animate all strips together
+      for (int base = 0; base < 40; base++) {
+        for (int offset = 0; base + offset < NUM_LEDS; offset += 40) {
+          leds1[base + offset] = warmWhite;
+          leds2[base + offset] = warmWhite;
+          leds3[base + offset] = warmWhite;
+          leds4[base + offset] = warmWhite;
+          leds5[base + offset] = warmWhite;
+        }
+        FastLED.show();
+        delay(30);
+      }
+    } else {
+      // Turn all off
+      FastLED.clear();
+      FastLED.show();
+    }
+
+    // Wait until button released (to prevent double toggles)
+    while (digitalRead(BUTTON_PIN) == LOW);
+    delay(50);
+  }
+
+  lastButtonState = buttonState;
+}

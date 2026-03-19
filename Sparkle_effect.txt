@@ -1,0 +1,7 @@
+void loop() {
+  fadeToBlackBy(leds, NUM_LEDS, 50);  // Fades out old sparkles
+  int pos = random16(NUM_LEDS);
+  leds[pos] += CHSV(random8(), 200, 255); // Random bright sparkle
+  FastLED.show();
+  delay(20);
+}
